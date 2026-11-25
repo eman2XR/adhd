@@ -9,6 +9,7 @@ const SHELL_FILES = [
   'ask.css',
   'site.css',
   'manifest.webmanifest',
+  'js/art.js',
   'js/ask.js',
   'js/github.js',
   'js/push.js',

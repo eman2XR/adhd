@@ -1,5 +1,5 @@
-// The request box: an empty page asks what it should become; once the page has content, a small button opens the same
-// box so more changes can be asked for. Also shows the status of earlier requests and turns notifications on.
+// The request box: an empty page asks what it should become; once the page has content, a smaller version of the same
+// box stays at the top so more changes can be asked for. Also shows the status of earlier requests and turns notifications on.
 
 import { flush, pending, queue, requestIssue, requests, saveLink, token } from './github.js';
 import { currentSubscription, enablePush, pushSupport } from './push.js';
@@ -39,10 +39,10 @@ function panel({ inPage }) {
   const status = el('p', { class: 'ask-status', role: 'status', 'aria-live': 'polite' });
   const field = el('textarea', {
     class: 'ask-field',
-    rows: inPage ? 7 : 5,
+    rows: inPage ? 7 : 3,
     placeholder: inPage
       ? 'For example: show me just one task at a time so I am not overwhelmed, a five-minute timer to help me get started, and a little celebration when I tick something off.'
-      : 'What should change?',
+      : 'For example: add a weekly look back on Sundays, or remind me every evening to tick off one thing.',
     'aria-label': 'What you want on the page and how it should behave',
   });
   const send = el('button', { class: 'button button--primary', type: 'submit' }, 'Send');
@@ -108,12 +108,10 @@ function panel({ inPage }) {
   return el(
     'section',
     { class: inPage ? 'ask ask--page' : 'ask' },
-    inPage ? el('h1', { class: 'ask-title' }, 'What should this page be?') : el('h2', { class: 'ask-title' }, 'Change something'),
-    inPage ? null : el('p', { class: 'ask-lead' }, 'Describe what to add, remove or change. You get a notification when it is live.'),
-    inPage ? notify : null,
+    inPage ? el('h1', { class: 'ask-title' }, 'What should this page be?') : el('h2', { class: 'ask-title' }, 'What should this page do next?'),
+    notify,
     form,
     linkBox,
-    inPage ? null : notify,
     history,
   );
 }
@@ -208,25 +206,10 @@ function mount() {
     document.body.classList.add('is-empty');
     (site || document.body).append(panel({ inPage: true }));
   } else {
-    const dialog = el('dialog', { class: 'ask-dialog', 'aria-label': 'Change something' });
-    const close = el('button', { class: 'button ask-close', type: 'button', onclick: () => dialog.close() }, 'Close');
-    dialog.addEventListener('click', (e) => {
-      if (e.target === dialog) dialog.close();
-    });
-    const open = el(
-      'button',
-      {
-        class: 'ask-fab',
-        type: 'button',
-        onclick: () => {
-          dialog.replaceChildren(close, panel({ inPage: false }));
-          dialog.showModal();
-        },
-      },
-      'Change something',
-    );
-    document.body.append(open, dialog);
+    const top = el('div', { class: 'ask-top' }, panel({ inPage: false }));
+    site.before(top);
   }
+  document.dispatchEvent(new CustomEvent('ask:ready'));
   flush();
 }
 

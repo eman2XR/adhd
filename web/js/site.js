@@ -1,6 +1,8 @@
 // Grow a little every day: one tiny step in each area of life the friend wants to grow in, a "just one thing" mode
 // for heavy days, a five-minute start timer, a week of progress, and a line about today. Everything stays on this device.
 
+import { areaArt, checkArt, clockArt, heartArt, installDefs, planeArt, plant, squiggleArt, starArt } from './art.js';
+
 const AREAS = [
   {
     id: 'learn',
@@ -143,21 +145,33 @@ function celebrate(anchor) {
   const layer = el('div', { class: 'burst', 'aria-hidden': 'true' });
   layer.style.left = `${rect.left + rect.width / 2}px`;
   layer.style.top = `${rect.top + rect.height / 2}px`;
-  const colors = ['var(--g-learn)', 'var(--g-focus)', 'var(--g-move)', 'var(--g-family)', 'var(--g-network)'];
-  for (let i = 0; i < 14; i += 1) {
-    const dot = el('span', { class: 'burst-dot' });
-    const angle = (Math.PI * 2 * i) / 14;
-    const dist = 40 + Math.random() * 30;
-    dot.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
-    dot.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
-    dot.style.background = colors[i % colors.length];
-    layer.append(dot);
+  const colors = ['var(--w-learn)', 'var(--w-focus)', 'var(--w-move)', 'var(--w-family)', 'var(--w-network)', 'var(--w-sun)'];
+  for (let i = 0; i < 16; i += 1) {
+    const leaf = el('span', { class: 'burst-leaf' });
+    const angle = (Math.PI * 2 * i) / 16 + Math.random() * 0.3;
+    const dist = 46 + Math.random() * 34;
+    leaf.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    leaf.style.setProperty('--dy', `${Math.sin(angle) * dist + 24}px`);
+    leaf.style.setProperty('--r', `${Math.round(Math.random() * 360)}deg`);
+    leaf.style.setProperty('--r2', `${Math.round(Math.random() * 360 + 180)}deg`);
+    leaf.style.background = colors[i % colors.length];
+    layer.append(leaf);
   }
   document.body.append(layer);
-  setTimeout(() => layer.remove(), 900);
+  setTimeout(() => layer.remove(), 1200);
 }
 
-const CHEERS = ['Nice. That counts.', 'Done. Small steps add up.', 'Look at you go.', 'One more step forward.', 'That is how growth happens.'];
+const CHEERS = ['Nice. A new leaf.', 'Done. Small steps add up.', 'Look at you grow.', 'One more step forward.', 'That is how growth happens.'];
+
+// The area ticked off last, so only its tick and leaf animate.
+let fresh = null;
+
+function greeting(hour = new Date().getHours()) {
+  if (hour < 5) return 'Hello, night owl';
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
 
 // A single five-minute timer, shown at the top while it runs. It survives a reload and chimes when it ends.
 const timer = { end: state.timer?.end || 0, label: state.timer?.label || '', handle: 0 };
@@ -208,7 +222,7 @@ function renderTimer(bar) {
   const time = el('span', { class: 'timer-time' });
   const label = el('span', { class: 'timer-label' });
   const stop = el('button', { class: 'g-button g-button--quiet', type: 'button', onclick: () => { timer.end = 0; saveTimer(); renderTimer(bar); } }, 'Stop');
-  bar.replaceChildren(el('div', { class: 'timer-text' }, label, time), stop);
+  bar.replaceChildren(el('span', { class: 'timer-icon' }, clockArt()), el('div', { class: 'timer-text' }, label, time), stop);
   const wasRunning = timer.end > Date.now();
   const tick = () => {
     const left = Math.max(0, Math.round((timer.end - Date.now()) / 1000));
@@ -245,20 +259,21 @@ function areaCard(area, refresh, timerBar) {
   const check = el(
     'button',
     {
-      class: `check${done ? ' is-done' : ''}`,
+      class: `check${done ? ' is-done' : ''}${done && fresh === area.id ? ' is-new' : ''}`,
       type: 'button',
       'aria-pressed': done ? 'true' : 'false',
       'aria-label': done ? `Undo: ${step}` : `Mark done: ${step}`,
       onclick: (e) => {
         if (rolledOver()) return;
         const nowDone = toggleDone(area.id);
+        fresh = nowDone ? area.id : null;
         if (nowDone) {
           celebrate(e.currentTarget);
           refresh(CHEERS[Math.floor(Math.random() * CHEERS.length)]);
         } else refresh();
       },
     },
-    el('span', { class: 'check-mark', 'aria-hidden': 'true' }),
+    checkArt(),
   );
 
   const actions = done
@@ -339,7 +354,7 @@ function areaCard(area, refresh, timerBar) {
     { class: 'week', 'aria-label': `${area.name}, last 7 days` },
     lastDays(7).map((d) => {
       const hit = state.done[dayKey(d)]?.[area.id];
-      return el('li', { class: `week-dot${hit ? ' is-hit' : ''}`, title: d.toLocaleDateString(undefined, { weekday: 'long' }) }, el('span', { class: 'sr' }, `${d.toLocaleDateString(undefined, { weekday: 'short' })}: ${hit ? 'done' : 'not done'}`));
+      return el('li', { class: `week-dot${hit ? ' is-hit' : ''}${dayKey(d) === today ? ' is-today' : ''}`, title: d.toLocaleDateString(undefined, { weekday: 'long' }) }, el('span', { class: 'sr' }, `${d.toLocaleDateString(undefined, { weekday: 'short' })}: ${hit ? 'done' : 'not done'}`));
     }),
   );
 
@@ -349,10 +364,10 @@ function areaCard(area, refresh, timerBar) {
     el(
       'header',
       { class: 'card-head' },
-      el('div', {}, el('h2', { class: 'card-title' }, area.name), el('p', { class: 'card-why' }, area.why)),
-      week,
+      el('div', { class: 'card-art' }, areaArt(area.id)),
+      el('div', {}, el('h2', { class: 'card-title' }, area.name), el('p', { class: 'card-why' }, area.why), week),
     ),
-    el('div', { class: 'card-step' }, check, el('p', { class: 'step-text' }, step)),
+    el('div', { class: 'card-step' }, check, el('p', { class: 'step-text' }, el('span', {}, step))),
     actions,
     week7 > 1 ? el('p', { class: 'card-streak' }, `${week7} days this week`) : null,
     ideas,
@@ -366,11 +381,7 @@ function render(message, openIdeas) {
 
   const timerBar = root.querySelector('.timer') || el('div', { class: 'timer', role: 'timer', hidden: true });
 
-  const progress = el(
-    'div',
-    { class: 'progress', role: 'img', 'aria-label': `${count} of ${AREAS.length} areas done today` },
-    AREAS.map((a) => el('span', { class: `progress-seg progress-seg--${a.id}${doneToday(a.id) ? ' is-on' : ''}` })),
-  );
+  const on = Object.fromEntries(AREAS.map((a) => [a.id, doneToday(a.id)]));
 
   const left = AREAS.filter((a) => !doneToday(a.id));
   const justOne = el(
@@ -392,7 +403,7 @@ function render(message, openIdeas) {
     'Just one thing',
   );
   const clear = el('button', { class: 'g-button g-button--quiet', type: 'button', hidden: true, onclick: () => render() }, 'Show all');
-  const hint = el('p', { class: 'lead-hint', role: 'status', 'aria-live': 'polite' }, message || (count === AREAS.length ? 'Every area today. That is a great day.' : count ? `${count} of ${AREAS.length} today. Every step counts.` : 'Pick any one tiny step below. One is a win; more is a bonus.'));
+  const hint = el('p', { class: 'lead-hint', role: 'status', 'aria-live': 'polite' }, message || (count === AREAS.length ? 'All five leaves today. The whole plant is green. What a day.' : count ? `${count} of ${AREAS.length} leaves today. Every step counts.` : 'Pick any one tiny step below. Each one you finish grows a leaf.'));
 
   const note = el('textarea', { class: 'g-input note-field', rows: 2, placeholder: 'One thing I am proud of today...', 'aria-label': 'One thing you are proud of today' });
   note.value = state.notes[today] || '';
@@ -415,9 +426,15 @@ function render(message, openIdeas) {
     el(
       'header',
       { class: 'top' },
-      el('p', { class: 'top-date' }, dateText),
-      el('h1', { class: 'top-title' }, 'Grow a little every day'),
-      progress,
+      el(
+        'div',
+        { class: 'top-text' },
+        el('p', { class: 'top-greet' }, greeting()),
+        el('p', { class: 'top-date' }, dateText),
+        el('h1', { class: 'top-title' }, 'Grow a little', el('br'), 'every day'),
+        el('span', { class: 'top-squiggle' }, squiggleArt()),
+      ),
+      el('div', { class: 'top-plant' }, plant(on, fresh)),
       hint,
       el('div', { class: 'top-actions' }, justOne, clear),
     ),
@@ -425,7 +442,7 @@ function render(message, openIdeas) {
     el(
       'section',
       { class: 'note' },
-      el('h2', { class: 'note-title' }, 'Today, I am proud of'),
+      el('h2', { class: 'note-title' }, el('span', { class: 'note-star' }, starArt()), 'Today, I am proud of'),
       note,
       past.length
         ? el(
@@ -435,7 +452,9 @@ function render(message, openIdeas) {
           )
         : null,
     ),
+    el('footer', { class: 'foot' }, el('span', {}, 'Made with care, just for you'), el('span', { class: 'foot-heart' }, heartArt())),
   );
+  fresh = null;
   if (openIdeas) root.querySelector(`[data-area="${openIdeas}"] details`)?.setAttribute('open', '');
   if (timer.end) renderTimer(timerBar);
 }
@@ -454,4 +473,11 @@ window.addEventListener('pageshow', rolledOver);
 window.addEventListener('focus', rolledOver);
 setInterval(rolledOver, 60 * 1000);
 
+// The request box (ask.js) sits above the page; give it a paper plane so it belongs to the same notebook.
+document.addEventListener('ask:ready', () => {
+  const box = document.querySelector('.ask-top .ask');
+  if (box && !box.querySelector('.ask-doodle')) box.prepend(el('span', { class: 'ask-doodle' }, planeArt()));
+});
+
+installDefs();
 render();

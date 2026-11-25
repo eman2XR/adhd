@@ -2,7 +2,7 @@
 
 https://eman2xr.github.io/adhd/
 
-An empty page that asks what it should be. Write what you want on it and how it should behave; it gets built, and you get a notification when the update is live. Once it has content, the "Change something" button asks for more.
+An empty page that asks what it should be. Write what you want on it and how it should behave; it gets built, and you get a notification when the update is live. Once it has content, the box at the top asks for more.
 
 Getting set up on iPhone (the page shows these steps too):
 

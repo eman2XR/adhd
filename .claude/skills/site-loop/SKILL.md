@@ -27,12 +27,13 @@ If a step fails (no network, `gh` not signed in, a deploy that fails twice after
 
 ## Building
 
-- The page is `web/index.html` (`<main id="site">`), `web/site.css` and `web/js/site.js`; add more files under `web/` when useful (and list each in `SHELL_FILES` in `web/sw.js`; `check.mjs` enforces it). On the first build remove `data-empty` from `<main id="site">`; the request box then becomes a "Change something" button.
+- The page is `web/index.html` (`<main id="site">`), `web/site.css` and `web/js/site.js`; add more files under `web/` when useful (and list each in `SHELL_FILES` in `web/sw.js`; `check.mjs` enforces it). On the first build remove `data-empty` from `<main id="site">`; the request box then becomes a smaller box above the page (`.ask-top`). Its colours follow the `--ask-*` variables, which `site.css` sets to match the page; `ask.js` fires `ask:ready` on `document` once the box is in place, for decoration (the paper plane).
 - Do not change `web/js/ask.js`, `github.js`, `push.js`, `ask.css` or the push handlers in `sw.js` unless a request is about the request box itself, and never in a way that stops requests or notifications working. `check.mjs` must pass.
 - Static only: no build step, no frameworks, no CDNs, no external fonts, images or requests. The Content-Security-Policy allows only the site itself and `api.github.com`; keep it that way. No inline scripts or styles: set styles from JavaScript with `element.style` or classes.
 - Data the friend enters on the page stays on their device (`localStorage`, keys prefixed `site.`). Do not send it anywhere; the repository and its issues are public.
-- Must work in Safari on iPhone, iPad and Mac and as a Home Screen app: tap targets of at least 44 px, inputs of 16 px or more, safe-area padding, nothing that needs hover, works in light and dark mode. Keep the request button clear of the page's own controls.
+- Must work in Safari on iPhone, iPad and Mac and as a Home Screen app: tap targets of at least 44 px, inputs of 16 px or more, safe-area padding, nothing that needs hover, works in light and dark mode. Keep the page's own controls clear of the sticky timer.
 - Original content and art only (CSS, inline SVG drawn in code). No copyrighted characters, logos, text or images. No emojis unless the friend asks for them.
+- Keep the look: an illustrated notebook (warm paper with a dot grid, hand-drawn ink with watercolour washes from `web/js/art.js`, Noteworthy headings, SF Rounded text, light and dark). New drawings go in `art.js` and use the `ink`, `wash` and `paper` layers so they wobble and recolour like the rest.
 - If a request is ambiguous, pick the reasonable reading, build it, and say in the `--note` what you assumed and that they can ask for changes.
 
 ## Rules for requests
