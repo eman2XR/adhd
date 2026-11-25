@@ -123,19 +123,22 @@ async function renderNotify(box, { nudge = false } = {}) {
   box.classList.toggle('ask-notify--nudge', nudge);
   const support = pushSupport();
   if (support === 'homescreen') {
-    box.append(
-      el('p', { class: 'ask-notify-title' }, 'First, put this page on your Home Screen'),
-      el('p', { class: 'ask-hint ask-hint--tight' }, 'That way it opens like an app and can tell you when your changes are live.'),
-      el(
-        'ol',
-        { class: 'ask-steps' },
-        el('li', {}, 'Tap the Share button in Safari (the square with an arrow; on newer iPhones it is in the ... menu).'),
-        el('li', {}, 'Scroll down and tap Add to Home Screen. If you see Open as Web App, leave it on. Tap Add.'),
-        el('li', {}, 'Close Safari and open the new icon on your Home Screen.'),
-        el('li', {}, 'Tap Notify me when it is live, then Allow.'),
-      ),
-      el('p', { class: 'ask-hint' }, 'You can also skip this and write below; you can check back here for updates instead.'),
-    );
+    // iPhone and iPad only allow notifications from the Home Screen app, so the button explains how to get there.
+    const steps = () =>
+      box.replaceChildren(
+        el('p', { class: 'ask-notify-title' }, 'Two minutes to set up notifications'),
+        el('p', { class: 'ask-hint ask-hint--tight' }, 'iPhone only sends notifications from pages on your Home Screen. Do this once:'),
+        el(
+          'ol',
+          { class: 'ask-steps' },
+          el('li', {}, 'Tap the Share button in Safari (the square with an arrow; on newer iPhones it is in the ... menu).'),
+          el('li', {}, 'Scroll down and tap Add to Home Screen. If you see Open as Web App, leave it on. Tap Add.'),
+          el('li', {}, 'Close Safari and open the new icon on your Home Screen.'),
+          el('li', {}, 'Tap Notify me when it is live again, then Allow.'),
+        ),
+      );
+    if (nudge) box.append(el('p', { class: 'ask-notify-title' }, 'Want a notification when it is live?'));
+    box.append(el('button', { class: 'button', type: 'button', onclick: steps }, 'Notify me when it is live'));
     return;
   }
   if (support !== 'ok') return;
