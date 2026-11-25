@@ -271,3 +271,51 @@ export function heartArt() {
 export function squiggleArt() {
   return svg('0 0 220 14', null, 'art--squiggle', ink(['M3 9 C 30 3, 52 12, 80 7 C 108 2, 130 12, 160 7 C 180 4, 198 6, 217 8']));
 }
+
+// A spiral-bound calendar page with a heart, a tick and a circled day.
+export function calendarArt() {
+  return svg(
+    '0 0 120 100',
+    null,
+    'art--calendar',
+    wash('M8 22 C 40 13, 82 13, 113 19 C 115 46, 114 72, 111 99 C 78 102, 42 101, 7 99 C 4 72, 5 46, 8 22 Z', 'wash--learn'),
+    paper('M14 18 L105 16 L107 93 L12 95 Z'),
+    wash('M12 16 C 44 12, 80 12, 108 15 L108 36 C 78 34, 44 34, 12 37 Z', 'wash--family'),
+    wash('M86 75 C 92 71, 101 74, 102 82 C 102 89, 95 92, 89 90 C 84 88, 83 79, 86 75 Z', 'wash--sun'),
+    wash('M71.5 42 C 71.5 38, 78 37.5, 77.5 43 C 77 47, 72.5 49.5, 71.5 52 C 70.5 49.5, 66 47, 65.5 43 C 65 37.5, 71.5 38, 71.5 42 Z', 'wash--family-deep'),
+    ink([
+      'M14 18 L105 16 L107 93 L12 95 Z',
+      'M13.5 35 C 44 33.5, 78 33.5, 105.8 33',
+      'M30 24 L30 11 C 30 6, 36 6, 36 11 L36 16',
+      'M50 23.5 L50 10.5 C 50 5.5, 56 5.5, 56 10.5 L56 15.5',
+      'M70 23 L70 10 C 70 5, 76 5, 76 10 L76 15',
+      'M90 22.5 L90 9.5 C 90 4.5, 96 4.5, 96 9.5 L96 14.5',
+      'M15 54 C 45 53, 78 53, 106 52.5',
+      'M15 74 C 45 73, 78 73, 106.5 72.5',
+      'M37 35 L36.5 94',
+      'M60 34 L60 94',
+      'M83 34 L84 93',
+      'M20 86 L24 90 L31 80',
+      'M71.5 43 C 71.5 40, 76 39.5, 76 43 C 76 46, 71.5 48, 71.5 50 C 71.5 48, 67 46, 67 43 C 67 39.5, 71.5 40, 71.5 43 Z',
+      'M94 77 C 99 77, 101 81, 100 84 C 99 88, 95 89, 92 88 C 88 87, 87 83, 88 80 C 89 77, 92 76, 96 77',
+      'M43 45 L53 45 M43 49 L50 49',
+    ]),
+  );
+}
+
+export function arrowArt(direction) {
+  return svg('0 0 24 24', null, 'art--arrow', ink([direction === 'left' ? 'M15 5 C 12 8, 10 10, 8 12 C 10 14, 12 16, 15 19' : 'M9 5 C 12 8, 14 10, 16 12 C 14 14, 12 16, 9 19']));
+}
+
+// A loose pencil ring for circling today on the month.
+export function ringArt() {
+  return svg('0 0 40 40', null, 'art--ring', ink(['M21 4 C 30 4.5, 36 11, 36 20 C 36 29.5, 29 36, 20 36 C 10.5 36, 4 29, 4.5 19.5 C 5 11, 11 4.5, 19 4.2 C 21.5 4, 24 4.6, 26 5.6']));
+}
+
+export function sproutArt() {
+  return svg('0 0 24 24', null, 'art--tab', ink(['M12 21 L12 12', 'M12 14.5 C 8.5 14.5, 5.5 12, 5 7.5 C 9 7.5, 12 10, 12 14.5', 'M12 12 C 12 8, 14.5 5, 19 4.5 C 19 9, 16 12, 12 12'], 'ink--current'));
+}
+
+export function calendarMiniArt() {
+  return svg('0 0 24 24', null, 'art--tab', ink(['M4 7 L20 6.5 L20.5 20 L4 20.5 Z', 'M4 11 L20.2 10.6', 'M8.5 4 L8.5 8.5', 'M15.5 3.8 L15.5 8.3', 'M8 15 L10 15 M14 15 L16 15'], 'ink--current'));
+}

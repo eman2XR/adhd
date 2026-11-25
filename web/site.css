@@ -351,3 +351,154 @@ body {
   .check.is-new .ink path.tick, .leaf.is-new .wash { animation: none; }
   .g-button, .check .art { transition: none; }
 }
+
+/* Tabs: Today and Calendar, like dividers in a notebook */
+.tabs { display: flex; gap: 8px; margin: 0 0 14px; }
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 12px;
+  font: 700 1.15rem/1 var(--hand);
+  color: var(--muted);
+  background: transparent;
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--wobbly);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tab.is-on { color: var(--ink); background: var(--card); border: 2px solid var(--ink); box-shadow: var(--shadow); }
+.tab .art { width: 22px; height: 22px; }
+.tab .ink path { stroke-width: 2; }
+
+/* Colours a plan can have; the same as the five areas, or none */
+.tone--none { --area: var(--ink-soft); --wash: var(--w-sun); --wash-deep: var(--w-focus-deep); }
+.tone--learn { --area: var(--c-learn); --wash: var(--w-learn); --wash-deep: var(--w-learn-deep); }
+.tone--focus { --area: var(--c-focus); --wash: var(--w-focus); --wash-deep: var(--w-focus-deep); }
+.tone--move { --area: var(--c-move); --wash: var(--w-move); --wash-deep: var(--w-move-deep); }
+.tone--family { --area: var(--c-family); --wash: var(--w-family); --wash-deep: var(--w-family-deep); }
+.tone--network { --area: var(--c-network); --wash: var(--w-network); --wash-deep: var(--w-network-deep); }
+.wash--family-deep { fill: var(--w-family-deep); }
+
+.g-button--small { min-height: 44px; padding: 6px 8px; font-size: 14px; }
+
+/* Today's plans on the Today tab */
+.plan, .month, .day-card { background: var(--card); border-radius: 22px 20px 24px 19px; box-shadow: var(--shadow); }
+.plan { margin: 0 0 14px; padding: 14px 16px 10px; }
+.plan-head { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; }
+.plan-art .art { width: 64px; height: 54px; }
+.plan-title { margin: 0; font: 700 1.3rem/1.15 var(--hand); }
+.plan-sub { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.plan-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+
+/* Plans, on a day or today */
+.items { list-style: none; margin: 8px 0 0; padding: 0; }
+.item { padding: 2px 0; border-top: 1.5px dashed var(--line); }
+.item:first-child { border-top: 0; }
+.item-main { display: flex; align-items: center; gap: 10px; }
+.item-text { display: flex; flex-direction: column; min-width: 0; }
+.item-time { font: 700 0.95rem/1.2 var(--hand); color: var(--area); }
+.item-words { font-size: 1.02rem; line-height: 1.35; overflow-wrap: anywhere; }
+.item.is-done .item-words { color: var(--ink-soft); }
+.item.is-done .item-words span {
+  background-image: linear-gradient(100deg, transparent 0 1%, var(--wash) 1% 98%, transparent 98%);
+  background-repeat: no-repeat;
+  background-size: 100% 58%;
+  background-position: 0 88%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.item-actions { display: flex; flex-wrap: wrap; gap: 0 14px; margin-top: -6px; padding-left: 52px; }
+
+/* The month */
+.month { margin: 0 0 14px; padding: 10px 8px 8px; }
+.month-head { display: flex; align-items: center; gap: 4px; }
+.month-title { flex: 1; margin: 0; font: 700 1.45rem/1.1 var(--hand); text-align: center; }
+.month-nav { width: 44px; padding: 0; display: flex; align-items: center; justify-content: center; }
+.month-nav .art { width: 22px; height: 22px; }
+.month-nav .ink path { stroke-width: 2.6; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; margin-top: 4px; }
+.cal-wd { padding: 4px 0; font-size: 12px; font-weight: 700; text-align: center; color: var(--muted); }
+.cal-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 54px;
+  padding: 7px 0 4px;
+  font: inherit;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-radius: 14px 12px 15px 11px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cal-day.is-selected { background: var(--sel); }
+.cal-day.is-past .cal-num { color: var(--muted); }
+.cal-num { position: relative; z-index: 1; font: 700 1.05rem/1.4 var(--hand); }
+.cal-ring { position: absolute; top: 2px; left: 50%; width: 34px; height: 34px; margin-left: -17px; pointer-events: none; }
+.cal-ring .art { width: 34px; height: 34px; }
+.cal-ring .ink path { stroke: var(--c-family); stroke-width: 2.4; }
+.cal-marks { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 9px; margin-top: 3px; }
+.cal-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50% 45% 55% 48%; background: var(--area); }
+.cal-dot.is-done { opacity: 0.4; }
+.cal-more { font: 700 11px/1 var(--ui); color: var(--muted); }
+.cal-leaf { display: inline-block; width: 9px; height: 7px; border-radius: 0 100% 0 100%; background: var(--w-move-deep); transform: rotate(-20deg); }
+.month-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; padding: 0 8px; }
+.month-key { display: flex; align-items: center; gap: 5px; margin: 0; font-size: 13px; color: var(--muted); }
+.month-key .cal-leaf { margin-left: 8px; }
+
+/* The chosen day */
+.day-card { padding: 14px 16px; }
+.day-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; font: 700 1.35rem/1.2 var(--hand); }
+.day-rel { font: 700 0.8rem/1 var(--ui); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c-family); }
+.day-empty { margin: 10px 0 0; color: var(--muted); }
+.day-status { margin: 6px 0 0; font: 700 1rem/1.3 var(--hand); color: var(--c-move); }
+.day-status:empty { display: none; }
+.day-status-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 6px; }
+.day-status-row .day-status { margin: 0; }
+.day-status-row:not(:has(.undo)):has(.day-status:empty) { display: none; }
+.undo { color: var(--c-move); border-color: var(--c-move); }
+.items--day { margin-top: 4px; }
+.item-edit { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 8px; }
+.item-edit-actions { display: flex; align-items: center; gap: 8px; }
+.item-edit-actions .item-remove { margin-right: auto; color: var(--c-family); }
+
+/* The Calendar tab's header, kept short so the month and the day stay close */
+.cal-top { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; margin: 0 0 12px; }
+.cal-top-title { margin: 0; font: 700 clamp(1.8rem, 7.5vw, 2.4rem)/1.05 var(--hand); }
+.cal-top-sub { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.cal-top-art .art { width: 84px; height: 70px; }
+
+/* While the five-minute timer is showing, sections scrolled into view stop below it */
+body.has-timer .tabs, body.has-timer .plan, body.has-timer .card, body.has-timer .month, body.has-timer .day-card { scroll-margin-top: 130px; }
+
+/* Dark mode: ticked things stay readable, with a softer highlighter */
+@media (prefers-color-scheme: dark) {
+  .item.is-done .item-words { color: var(--ink); }
+  .item.is-done .item-words span,
+  .card.is-done .step-text span { background-image: linear-gradient(100deg, transparent 0 1%, color-mix(in srgb, var(--wash) 38%, transparent) 1% 98%, transparent 98%); }
+}
+.add { margin-top: 10px; padding-bottom: 8px; border-bottom: 1.5px dashed var(--line); }
+.add-main { display: flex; align-items: flex-end; gap: 10px; }
+.add-main .g-input { flex: 1; min-width: 0; }
+.add-main--today { margin-top: 8px; }
+.add-options { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 6px; }
+.add-time-wrap { display: flex; align-items: flex-end; gap: 6px; }
+.add-time-show { padding-left: 2px; }
+.add-time-label { display: flex; flex-direction: column; width: 118px; font-size: 13px; color: var(--muted); }
+.add-time { min-height: 44px; }
+.chips { display: flex; flex-wrap: wrap; }
+.chip { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; background: none; border: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.chip-dot { width: 24px; height: 24px; background: var(--wash); border: 2px solid var(--area); border-radius: 50% 45% 55% 48% / 52% 50% 46% 54%; }
+.chip.tone--none .chip-dot { background: transparent; border-style: dashed; }
+.chip.is-on .chip-dot { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--ink); }
+
+.top-calendar .art { width: 136px; height: 114px; }
+
+:root { --sel: rgb(248 213 106 / 0.45); }
+@media (prefers-color-scheme: dark) { :root { --sel: rgb(214 173 60 / 0.3); } }

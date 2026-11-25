@@ -11,7 +11,7 @@ A static site at https://eman2xr.github.io/adhd/ (repository https://github.com/
 
 ## Layout
 
-- `web/index.html` (`<main id="site">`; `data-empty` while there is nothing built), `web/site.css`, `web/js/site.js` and `web/js/art.js` (the page itself: Grow, and its hand-drawn illustrations), `web/ask.css`, `web/js/ask.js`, `web/js/github.js`, `web/js/push.js` (the request box, posting, notifications), `web/sw.js` (offline cache and push handlers), `web/manifest.webmanifest`, `web/icons/` (`scripts/make_icons.py`).
+- `web/index.html` (`<main id="site">`; `data-empty` while there is nothing built), `web/site.css`, `web/js/site.js`, `web/js/calendar.js`, `web/js/util.js` and `web/js/art.js` (the page itself: Grow with its Today and Calendar tabs, and its hand-drawn illustrations), `web/ask.css`, `web/js/ask.js`, `web/js/github.js`, `web/js/push.js` (the request box, posting, notifications), `web/sw.js` (offline cache and push handlers), `web/manifest.webmanifest`, `web/icons/` (`scripts/make_icons.py`).
 - `scripts/requests.mjs`, `scripts/ship.mjs`, `scripts/link.mjs`, `scripts/push.mjs`, `scripts/check.mjs` (keeps the request box, CSP and offline cache intact; runs in the deploy).
 - `docs/REQUESTS.md`: what was asked and built, newest first.
 - `tests/`: `node --test`.

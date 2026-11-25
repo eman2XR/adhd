@@ -1,7 +1,9 @@
 // Grow a little every day: one tiny step in each area of life the friend wants to grow in, a "just one thing" mode
 // for heavy days, a five-minute start timer, a week of progress, and a line about today. Everything stays on this device.
 
-import { areaArt, checkArt, clockArt, heartArt, installDefs, planeArt, plant, squiggleArt, starArt } from './art.js';
+import { areaArt, calendarArt, calendarMiniArt, checkArt, clockArt, heartArt, installDefs, planeArt, plant, sproutArt, squiggleArt, starArt } from './art.js';
+import { afterRender, calendarView, cleanEvents, openOn, planCard } from './calendar.js';
+import { dayKey, el, reducedMotion } from './util.js';
 
 const AREAS = [
   {
@@ -58,7 +60,9 @@ function load() {
   const notes = {};
   for (const [k, v] of Object.entries(obj(data.notes))) if (typeof v === 'string') notes[k] = v;
   const timer = isObj(data.timer) && typeof data.timer.end === 'number' ? data.timer : null;
-  return { done, own, picked, notes, timer };
+  const events = cleanEvents(data.events);
+  const tab = data.tab === 'calendar' ? 'calendar' : 'today';
+  return { done, own, picked, notes, timer, events, tab };
 }
 
 let state = load();
@@ -68,27 +72,11 @@ function save() {
   } catch {}
 }
 
-function dayKey(date = new Date()) {
-  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 function lastDays(n) {
   const out = [];
   const now = new Date();
   for (let i = n - 1; i >= 0; i -= 1) out.push(new Date(now.getFullYear(), now.getMonth(), now.getDate() - i));
   return out;
-}
-
-function el(tag, attrs = {}, ...children) {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'class') node.className = v;
-    else if (k.startsWith('on')) node.addEventListener(k.slice(2), v);
-    else if (v !== false && v != null) node.setAttribute(k, v === true ? '' : v);
-  }
-  for (const c of children.flat()) if (c != null && c !== false) node.append(c);
-  return node;
 }
 
 function ideasFor(area) {
@@ -133,10 +121,6 @@ function toggleDone(areaId) {
 
 function thisWeek(areaId) {
   return lastDays(7).filter((d) => state.done[dayKey(d)]?.[areaId]).length;
-}
-
-function reducedMotion() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 function celebrate(anchor) {
@@ -213,6 +197,7 @@ function announce(text) {
 
 function renderTimer(bar) {
   clearInterval(timer.handle);
+  document.body.classList.toggle('has-timer', Boolean(timer.end));
   if (!timer.end) {
     bar.replaceChildren();
     bar.hidden = true;
@@ -374,13 +359,60 @@ function areaCard(area, refresh, timerBar) {
   );
 }
 
-function render(message, openIdeas) {
+function tabBar() {
+  const tab = (id, label, art) =>
+    el(
+      'button',
+      {
+        class: `tab${state.tab === id ? ' is-on' : ''}`,
+        type: 'button',
+        role: 'tab',
+        'aria-selected': state.tab === id ? 'true' : 'false',
+        onclick: () => {
+          if (state.tab === id) return;
+          state.tab = id;
+          save();
+          render();
+          showTabs();
+        },
+      },
+      art,
+      el('span', {}, label),
+    );
+  return el('div', { class: 'tabs', role: 'tablist', 'aria-label': 'Views' }, tab('today', 'Today', sproutArt()), tab('calendar', 'Calendar', calendarMiniArt()));
+}
+
+// Brings the tabs into view after switching, below the sticky timer when it is running.
+function showTabs() {
+  const tabs = document.querySelector('.tabs');
+  const bar = document.querySelector('.timer:not([hidden])');
+  const clear = bar ? bar.getBoundingClientRect().bottom : 0;
+  if (tabs && tabs.getBoundingClientRect().top < clear) tabs.scrollIntoView({ block: 'start' });
+}
+
+// What the calendar needs from the page.
+function calendarContext() {
+  return {
+    state,
+    save,
+    refresh: () => render(),
+    celebrate,
+    rolledOver,
+    areaName: (id) => AREAS.find((a) => a.id === id)?.name || id,
+    openCalendar: (day) => {
+      openOn(day);
+      state.tab = 'calendar';
+      save();
+      render();
+      showTabs();
+    },
+  };
+}
+
+function todayPage(message, timerBar, ctx) {
   const root = document.getElementById('site');
   const today = dayKey();
   const count = AREAS.filter((a) => doneToday(a.id)).length;
-
-  const timerBar = root.querySelector('.timer') || el('div', { class: 'timer', role: 'timer', hidden: true });
-
   const on = Object.fromEntries(AREAS.map((a) => [a.id, doneToday(a.id)]));
 
   const left = AREAS.filter((a) => !doneToday(a.id));
@@ -421,8 +453,7 @@ function render(message, openIdeas) {
 
   const dateText = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
 
-  root.replaceChildren(
-    timerBar,
+  return [
     el(
       'header',
       { class: 'top' },
@@ -438,6 +469,7 @@ function render(message, openIdeas) {
       hint,
       el('div', { class: 'top-actions' }, justOne, clear),
     ),
+    planCard(ctx),
     el('section', { class: 'cards', 'aria-label': 'Today\'s steps' }, AREAS.map((a) => areaCard(a, render, timerBar))),
     el(
       'section',
@@ -452,11 +484,36 @@ function render(message, openIdeas) {
           )
         : null,
     ),
+  ];
+}
+
+function calendarPage(ctx) {
+  return [
+    el(
+      'header',
+      { class: 'cal-top' },
+      el('div', {}, el('h1', { class: 'cal-top-title' }, 'Plan your days'), el('p', { class: 'cal-top-sub' }, 'Small plans are best. Moving one is always fine.')),
+      el('div', { class: 'cal-top-art' }, calendarArt()),
+    ),
+    ...calendarView(ctx),
+  ];
+}
+
+function render(message, openIdeas) {
+  const root = document.getElementById('site');
+  const timerBar = root.querySelector('.timer') || el('div', { class: 'timer', role: 'timer', hidden: true });
+  const ctx = calendarContext();
+  const page = state.tab === 'calendar' ? calendarPage(ctx) : todayPage(message, timerBar, ctx);
+  root.replaceChildren(
+    timerBar,
+    tabBar(),
+    ...page,
     el('footer', { class: 'foot' }, el('span', {}, 'Made with care, just for you'), el('span', { class: 'foot-heart' }, heartArt())),
   );
   fresh = null;
   if (openIdeas) root.querySelector(`[data-area="${openIdeas}"] details`)?.setAttribute('open', '');
   if (timer.end) renderTimer(timerBar);
+  afterRender();
 }
 
 // A new day starts fresh after midnight: checked before every tap, when the app comes back, and once a minute.
@@ -465,6 +522,7 @@ function rolledOver() {
   if (dayKey() === shownDay) return false;
   shownDay = dayKey();
   state = load();
+  openOn(shownDay);
   render('A new day. Pick any one tiny step.');
   return true;
 }
