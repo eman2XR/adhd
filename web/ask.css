@@ -48,7 +48,7 @@ body.is-empty #site {
 .ask { width: 100%; max-width: 560px; }
 
 .ask-title { margin: 0 0 8px; font-size: 1.6rem; line-height: 1.2; letter-spacing: -0.01em; }
-.ask--page .ask-title { font-size: clamp(1.9rem, 6vw, 2.6rem); }
+.ask--page .ask-title { margin-bottom: 20px; font-size: clamp(1.9rem, 6vw, 2.6rem); }
 .ask-lead { margin: 0 0 20px; color: var(--ask-muted); }
 
 .ask-field {

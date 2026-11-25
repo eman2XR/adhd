@@ -41,7 +41,7 @@ function panel({ inPage }) {
     class: 'ask-field',
     rows: inPage ? 7 : 5,
     placeholder: inPage
-      ? 'For example: a calm page with my weekly plan, big tick boxes, and a timer that turns green when I take a break.'
+      ? 'For example: show me just one task at a time so I am not overwhelmed, a five-minute timer to help me get started, and a little celebration when I tick something off.'
       : 'What should change?',
     'aria-label': 'What you want on the page and how it should behave',
   });
@@ -109,13 +109,7 @@ function panel({ inPage }) {
     'section',
     { class: inPage ? 'ask ask--page' : 'ask' },
     inPage ? el('h1', { class: 'ask-title' }, 'What should this page be?') : el('h2', { class: 'ask-title' }, 'Change something'),
-    el(
-      'p',
-      { class: 'ask-lead' },
-      inPage
-        ? 'This page is empty and it is yours. Write what you want on it and how it should behave, in your own words. It gets built for you, and you get a notification when it is live.'
-        : 'Describe what to add, remove or change. You get a notification when it is live.',
-    ),
+    inPage ? null : el('p', { class: 'ask-lead' }, 'Describe what to add, remove or change. You get a notification when it is live.'),
     inPage ? notify : null,
     form,
     linkBox,
