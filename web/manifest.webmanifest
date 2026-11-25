@@ -1,7 +1,7 @@
 {
-  "name": "My page",
-  "short_name": "My page",
-  "description": "A page built from what you ask for.",
+  "name": "Grow",
+  "short_name": "Grow",
+  "description": "Grow a little every day: one tiny step in each area of life.",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f5f0",

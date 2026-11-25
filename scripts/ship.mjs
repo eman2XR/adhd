@@ -1,7 +1,7 @@
 // After a change is committed and pushed to main: waits until GitHub Pages serves that commit, then closes the
-// requests it answers and sends the notification.
+// requests it answers (if any; a request can also arrive outside the page) and sends the notification.
 //
-//   node scripts/ship.mjs --done 3,4 --title "Your page is live" --body "Weekly plan with tick boxes" [--note "reply on the issue"]
+//   node scripts/ship.mjs [--done 3,4] --title "Your page is live" --body "Weekly plan with tick boxes" [--note "reply on the issue"]
 
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -21,7 +21,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function main() {
   const title = arg('title');
   const done = (arg('done') || '').split(',').map((s) => s.trim()).filter(Boolean);
-  if (!title || !done.length) throw new Error('usage: ship.mjs --done N[,N] --title T --body B [--note N]');
+  if (!title) throw new Error('usage: ship.mjs [--done N[,N]] --title T --body B [--note N]');
   if (git('status', '--porcelain')) throw new Error('uncommitted changes: commit and push first');
   git('fetch', '-q', 'origin', 'main');
   const sha = git('rev-parse', 'HEAD');
