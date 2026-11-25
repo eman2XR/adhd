@@ -1,0 +1,5 @@
+.DS_Store
+.checks/
+.claude/*
+!.claude/skills/
+.push/
