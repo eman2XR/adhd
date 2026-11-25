@@ -1,5 +1,5 @@
-// The request box: an empty page asks what it should become; once the page has content, a smaller version of the same
-// box stays at the top so more changes can be asked for. Also shows the status of earlier requests and turns notifications on.
+// The request box: an empty page asks what it should become; once the page has content, a button at the top opens the
+// same box in a popup so more changes can be asked for. Also shows the status of earlier requests and turns notifications on.
 
 import { flush, pending, queue, requestIssue, requests, saveLink, token } from './github.js';
 import { currentSubscription, enablePush, pushSupport } from './push.js';
@@ -108,7 +108,7 @@ function panel({ inPage }) {
   return el(
     'section',
     { class: inPage ? 'ask ask--page' : 'ask' },
-    inPage ? el('h1', { class: 'ask-title' }, 'What should this page be?') : el('h2', { class: 'ask-title' }, 'What should this page do next?'),
+    inPage ? el('h1', { class: 'ask-title' }, 'What should this page be?') : el('h2', { class: 'ask-title', tabindex: '-1', autofocus: true }, 'What should this page do next?'),
     notify,
     form,
     linkBox,
@@ -206,8 +206,29 @@ function mount() {
     document.body.classList.add('is-empty');
     (site || document.body).append(panel({ inPage: true }));
   } else {
-    const top = el('div', { class: 'ask-top' }, panel({ inPage: false }));
-    site.before(top);
+    const dialog = el('dialog', { class: 'ask-dialog', 'aria-label': 'What should this page do next?' });
+    const close = el('button', { class: 'button ask-close', type: 'button', onclick: () => dialog.close() }, 'Close');
+    // A tap on the dimmed backdrop closes the popup; the box itself fills the dialog, so taps inside never reach it.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    const open = el(
+      'button',
+      {
+        class: 'ask-open',
+        type: 'button',
+        'aria-haspopup': 'dialog',
+        onclick: () => {
+          const box = panel({ inPage: false });
+          dialog.replaceChildren(close, box);
+          document.dispatchEvent(new CustomEvent('ask:panel', { detail: box }));
+          dialog.showModal();
+        },
+      },
+      el('span', { class: 'ask-open-text' }, el('span', { class: 'ask-open-title' }, 'What should this page do next?'), el('span', { class: 'ask-open-sub' }, 'Ask for changes and get notified')),
+      el('span', { class: 'ask-open-arrow', 'aria-hidden': 'true' }, '\u203a'),
+    );
+    site.before(el('div', { class: 'ask-top' }, open, dialog));
   }
   document.dispatchEvent(new CustomEvent('ask:ready'));
   flush();

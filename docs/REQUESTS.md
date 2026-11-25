@@ -2,6 +2,10 @@
 
 What the friend asked for and what was built, newest first. The site loop adds an entry for every round that ships.
 
+## 2026-11-24: the request box as a button with a popup (asked by the owner)
+
+Built: above the page, a single button ("What should this page do next?", with the paper plane and a drawn arrow) opens the request box in a popup: notifications, the prompt and the status of earlier requests. It closes with Close, a tap on the dimmed backdrop or Escape, and starts at its title, so no button is focused and VoiceOver reads the title first.
+
 ## 2026-11-24: a calendar to organise things (#3)
 
 Asked: "I want a calendar to organize stuff".

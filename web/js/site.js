@@ -1,7 +1,7 @@
 // Grow a little every day: one tiny step in each area of life the friend wants to grow in, a "just one thing" mode
 // for heavy days, a five-minute start timer, a week of progress, and a line about today. Everything stays on this device.
 
-import { areaArt, calendarArt, calendarMiniArt, checkArt, clockArt, heartArt, installDefs, planeArt, plant, sproutArt, squiggleArt, starArt } from './art.js';
+import { areaArt, arrowArt, calendarArt, calendarMiniArt, checkArt, clockArt, heartArt, installDefs, planeArt, plant, sproutArt, squiggleArt, starArt } from './art.js';
 import { afterRender, calendarView, cleanEvents, openOn, planCard } from './calendar.js';
 import { dayKey, el, reducedMotion } from './util.js';
 
@@ -531,10 +531,12 @@ window.addEventListener('pageshow', rolledOver);
 window.addEventListener('focus', rolledOver);
 setInterval(rolledOver, 60 * 1000);
 
-// The request box (ask.js) sits above the page; give it a paper plane so it belongs to the same notebook.
+// The request button (ask.js) sits above the page; draw it into the same notebook: a paper plane and a pencil arrow.
 document.addEventListener('ask:ready', () => {
-  const box = document.querySelector('.ask-top .ask');
-  if (box && !box.querySelector('.ask-doodle')) box.prepend(el('span', { class: 'ask-doodle' }, planeArt()));
+  const open = document.querySelector('.ask-open');
+  if (!open || open.querySelector('.ask-open-icon')) return;
+  open.prepend(el('span', { class: 'ask-open-icon' }, planeArt()));
+  open.querySelector('.ask-open-arrow')?.replaceChildren(arrowArt('right'));
 });
 
 installDefs();

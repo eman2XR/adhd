@@ -334,18 +334,26 @@ body {
   to { transform: translate(var(--dx), var(--dy)) rotate(var(--r2)) scale(1); opacity: 0; }
 }
 
-/* The request box above the page */
+/* The request button above the page, and its popup */
 .ask-top { padding-top: max(14px, env(safe-area-inset-top)); }
-.ask-top .ask { position: relative; padding: 18px 16px 16px; border: 0; border-radius: 20px 24px 19px 22px; box-shadow: var(--shadow); }
-.ask-top .ask-title { margin: 0 0 12px; padding-right: 78px; font: 700 1.35rem/1.2 var(--hand); }
-.ask-doodle { position: absolute; top: 8px; right: 12px; pointer-events: none; }
-.ask-doodle .art { width: 72px; height: 45px; }
-.ask-top .ask-field { border: 1.5px dashed var(--line-strong); border-radius: 14px; }
-.ask-top .ask-field:focus { outline: 2px solid var(--ink); border-color: transparent; }
-.ask-top .button { color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: var(--wobbly); }
-.ask-top .button--primary { color: var(--card); background: var(--ink); }
-.ask-top .ask-steps { color: var(--ink-soft); }
-.ask-top .ask-item--live .ask-badge { color: var(--c-move); }
+.ask-open { gap: 10px; min-height: 64px; padding: 8px 14px 8px 10px; border: 0; border-radius: 20px 24px 19px 22px; box-shadow: var(--shadow); }
+.ask-open:active { transform: translateY(1px); }
+.ask-open-icon .art { width: 58px; height: 36px; }
+.ask-open-title { font: 700 1.2rem/1.2 var(--hand); }
+.ask-open-sub { font-size: 13px; }
+.ask-open-arrow .art { width: 22px; height: 22px; }
+.ask-open-arrow .ink path { stroke: var(--muted); stroke-width: 2.6; }
+.ask-dialog { border-radius: 22px 26px 21px 24px; box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.5); }
+.ask-dialog::backdrop { background: rgb(40 30 20 / 0.45); }
+.ask-dialog .ask { padding: 22px 18px 18px; }
+.ask-dialog .ask-title { margin: 0 0 14px; font: 700 1.45rem/1.2 var(--hand); }
+.ask-dialog .ask-field { border: 1.5px dashed var(--line-strong); border-radius: 14px; }
+.ask-dialog .ask-field:focus { outline: 2px solid var(--ink); border-color: transparent; }
+.ask-dialog .button { color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: var(--wobbly); }
+.ask-dialog .button--primary { color: var(--card); background: var(--ink); }
+.ask-dialog .ask-close { border-color: transparent; color: var(--muted); }
+.ask-dialog .ask-steps { color: var(--ink-soft); }
+.ask-dialog .ask-item--live .ask-badge { color: var(--c-move); }
 
 @media (prefers-reduced-motion: reduce) {
   .check.is-new .ink path.tick, .leaf.is-new .wash { animation: none; }
