@@ -116,9 +116,10 @@ function panel({ inPage }) {
         ? 'This page is empty and it is yours. Write what you want on it and how it should behave, in your own words. It gets built for you, and you get a notification when it is live.'
         : 'Describe what to add, remove or change. You get a notification when it is live.',
     ),
+    inPage ? notify : null,
     form,
     linkBox,
-    notify,
+    inPage ? null : notify,
     history,
   );
 }
@@ -129,14 +130,17 @@ async function renderNotify(box, { nudge = false } = {}) {
   const support = pushSupport();
   if (support === 'homescreen') {
     box.append(
-      el('p', { class: 'ask-notify-title' }, 'Get a notification when it is live'),
+      el('p', { class: 'ask-notify-title' }, 'First, put this page on your Home Screen'),
+      el('p', { class: 'ask-hint ask-hint--tight' }, 'That way it opens like an app and can tell you when your changes are live.'),
       el(
         'ol',
         { class: 'ask-steps' },
-        el('li', {}, 'Tap the Share button at the bottom of Safari.'),
-        el('li', {}, 'Choose Add to Home Screen, then Add.'),
-        el('li', {}, 'Open the page from your Home Screen and tap Notify me.'),
+        el('li', {}, 'Tap the Share button in Safari (the square with an arrow; on newer iPhones it is in the ... menu).'),
+        el('li', {}, 'Scroll down and tap Add to Home Screen. If you see Open as Web App, leave it on. Tap Add.'),
+        el('li', {}, 'Close Safari and open the new icon on your Home Screen.'),
+        el('li', {}, 'Tap Notify me when it is live, then Allow.'),
       ),
+      el('p', { class: 'ask-hint' }, 'You can also skip this and write below; you can check back here for updates instead.'),
     );
     return;
   }
@@ -147,7 +151,10 @@ async function renderNotify(box, { nudge = false } = {}) {
     else box.append(el('p', { class: 'ask-hint' }, 'You will get a notification when it is live.'));
     return;
   }
-  if (nudge) box.append(el('p', { class: 'ask-notify-title' }, 'Want a notification when it is live?'));
+  box.append(
+    el('p', { class: 'ask-notify-title' }, nudge ? 'Want a notification when it is live?' : 'Turn on notifications'),
+    el('p', { class: 'ask-hint ask-hint--tight' }, 'Tap the button, then Allow, so you hear when your changes are live.'),
+  );
   const button = el(
     'button',
     {
@@ -173,7 +180,7 @@ async function renderNotify(box, { nudge = false } = {}) {
         }
       },
     },
-    nudge ? 'Notify me' : 'Notify me when it is live',
+    'Notify me when it is live',
   );
   box.append(button);
 }
