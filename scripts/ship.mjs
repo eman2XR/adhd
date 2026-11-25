@@ -40,17 +40,20 @@ async function main() {
   const watch = spawnSync('gh', ['run', 'watch', String(run.databaseId), '-R', REPO, '--exit-status', '--interval', '10'], { stdio: ['ignore', 'ignore', 'inherit'] });
   if (watch.status !== 0) throw new Error(`deploy run ${run.databaseId} failed: gh run view ${run.databaseId} -R ${REPO} --log-failed`);
 
-  // Pages can take a little longer than the run to serve the new files; the build stamps sw.js with the commit.
-  let live = false;
-  for (let i = 0; i < 40 && !live; i += 1) {
+  // deploy-pages only succeeds once Pages serves the new files. When the site is reachable from here, also confirm the
+  // served sw.js carries this commit (the build stamps it); some networks block github.io, so that check is optional.
+  let live = null;
+  for (let i = 0; i < 20 && live !== true; i += 1) {
     try {
       const res = await fetch(`${SITE}sw.js?v=${Date.now()}`, { cache: 'no-store' });
       live = res.ok && (await res.text()).includes(short);
-    } catch {}
+    } catch {
+      break;
+    }
     if (!live) await sleep(6000);
   }
-  if (!live) throw new Error(`${SITE} does not serve ${short} yet; run ship.mjs again in a few minutes`);
-  console.log(`${SITE} serves ${short}`);
+  if (live === false) throw new Error(`${SITE} does not serve ${short} yet; run ship.mjs again in a few minutes`);
+  console.log(live ? `${SITE} serves ${short}` : `deployed ${short} (site not reachable from here to double-check)`);
 
   const note = arg('note') || `Live now: ${SITE}`;
   for (const n of done) {

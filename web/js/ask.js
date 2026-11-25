@@ -66,7 +66,8 @@ function panel({ inPage }) {
         status.textContent = 'Sending...';
         const r = await flush();
         send.disabled = false;
-        status.textContent = r.error ? errorText(r.error) : 'Sent. You will get a notification when it is live (if notifications are on), or check back here.';
+        status.textContent = r.error ? errorText(r.error) : 'Sent. It is usually built within a few hours.';
+        if (!r.error) renderNotify(notify, { nudge: true });
         loadHistory(history);
       },
     },
@@ -77,8 +78,7 @@ function panel({ inPage }) {
 
   const linkBox = el('div', { class: 'ask-link' });
   if (!token()) {
-    status.textContent = 'Open this page from the personal link you were sent, so it can send your message.';
-    const input = el('input', { class: 'ask-field', type: 'url', placeholder: 'Or paste your personal link here', 'aria-label': 'Your personal link', autocomplete: 'off' });
+    const input = el('input', { class: 'ask-field', type: 'url', placeholder: 'Paste the link you were sent', 'aria-label': 'Your personal link', autocomplete: 'off' });
     const save = el('button', {
       class: 'button',
       type: 'button',
@@ -90,7 +90,15 @@ function panel({ inPage }) {
         } else status.textContent = 'That does not look like your personal link.';
       },
     }, 'Save link');
-    linkBox.append(input, el('div', { class: 'ask-actions' }, save));
+    const reveal = el('button', {
+      class: 'ask-quiet',
+      type: 'button',
+      onclick: () => {
+        linkBox.replaceChildren(input, el('div', { class: 'ask-actions' }, save));
+        input.focus();
+      },
+    }, 'I have a link');
+    linkBox.append(reveal);
   }
   if (pending().length) status.textContent = `${pending().length} message(s) waiting to be sent.`;
 
@@ -115,21 +123,31 @@ function panel({ inPage }) {
   );
 }
 
-async function renderNotify(box) {
+async function renderNotify(box, { nudge = false } = {}) {
   box.replaceChildren();
+  box.classList.toggle('ask-notify--nudge', nudge);
   const support = pushSupport();
   if (support === 'homescreen') {
     box.append(
-      el('p', { class: 'ask-hint' }, 'To get a notification when it is live: tap the Share button, choose Add to Home Screen, open the page from your Home Screen, and come back here.'),
+      el('p', { class: 'ask-notify-title' }, 'Get a notification when it is live'),
+      el(
+        'ol',
+        { class: 'ask-steps' },
+        el('li', {}, 'Tap the Share button at the bottom of Safari.'),
+        el('li', {}, 'Choose Add to Home Screen, then Add.'),
+        el('li', {}, 'Open the page from your Home Screen and tap Notify me.'),
+      ),
     );
     return;
   }
   if (support !== 'ok') return;
   const sub = await currentSubscription();
   if (sub && localStorage.getItem(NOTIFY_KEY) === 'on') {
-    box.append(el('p', { class: 'ask-hint' }, 'Notifications are on for this device.'));
+    if (!nudge) box.append(el('p', { class: 'ask-hint' }, 'Notifications are on for this device.'));
+    else box.append(el('p', { class: 'ask-hint' }, 'You will get a notification when it is live.'));
     return;
   }
+  if (nudge) box.append(el('p', { class: 'ask-notify-title' }, 'Want a notification when it is live?'));
   const button = el(
     'button',
     {
@@ -147,7 +165,7 @@ async function renderNotify(box) {
           const sent = await flush();
           localStorage.setItem(NOTIFY_KEY, 'on');
           box.replaceChildren(
-            el('p', { class: 'ask-hint' }, sent.error ? errorText(sent.error) : 'Done. A welcome notification arrives within a few hours, once this device is registered.'),
+            el('p', { class: 'ask-hint' }, sent.error ? errorText(sent.error) : 'Done. A first notification arrives within a few hours to show it works.'),
           );
         } catch (err) {
           button.disabled = false;
@@ -155,7 +173,7 @@ async function renderNotify(box) {
         }
       },
     },
-    'Notify me when it is live',
+    nudge ? 'Notify me' : 'Notify me when it is live',
   );
   box.append(button);
 }
